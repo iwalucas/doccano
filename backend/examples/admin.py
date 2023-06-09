@@ -4,9 +4,10 @@ from .models import Comment, Example
 
 
 class ExampleAdmin(admin.ModelAdmin):
-    list_display = ("text", "project", "meta")
+    list_display = ("text", "project", "meta","uploaded_file")
     ordering = ("project",)
-    search_fields = ("text",)
+    search_fields = ("text","uploaded_file",)
+    list_filter = ("project","uploaded_file")
 
 
 class CommentAdmin(admin.ModelAdmin):
