@@ -49,7 +49,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           file: ./docker/Dockerfile.prod
           push: ${{ github.event_name != 'pull_request' }}
-          tags: doccano/doccano:backend
+          tags: iwalucas/doccano:backend
           labels: ${{ steps.docker_meta.outputs.labels }}
       
       - name: Build a frontend image and push
@@ -59,5 +59,5 @@ jobs:
           platforms: linux/amd64,linux/arm64
           file: ./docker/Dockerfile.nginx
           push: ${{ github.event_name != 'pull_request' }}
-          tags: doccano/doccano:frontend
+          tags: iwalucas/doccano:frontend
           labels: ${{ steps.docker_meta.outputs.labels }}
