@@ -6,8 +6,8 @@ from .models import Comment, Example
 class ExampleAdmin(admin.ModelAdmin):
     list_display = ("text", "project", "meta","uploaded_file")
     ordering = ("project",)
-    search_fields = ("text","uploaded_file",)
-    list_filter = ("project","uploaded_file")
+    search_fields = ("text","upload_name",)
+    list_filter = ("project","upload_name")
 
 
 class CommentAdmin(admin.ModelAdmin):
