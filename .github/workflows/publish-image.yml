@@ -1,4 +1,4 @@
-name: ci
+name: DockerBuildAndPublish
 
 on:
   schedule:
