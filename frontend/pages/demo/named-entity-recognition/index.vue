@@ -205,7 +205,7 @@ export default {
   font-size: 1.25rem !important;
   font-weight: 500;
   line-height: 2rem;
-  font-family: 'Roboto', sans-serif !important;
+  font-family: monospace !important;
   opacity: 0.8;
 }
 </style>
