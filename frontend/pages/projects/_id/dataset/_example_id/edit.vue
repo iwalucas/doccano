@@ -27,11 +27,12 @@ import { ExampleDTO } from '~/services/application/example/exampleData'
 export default Vue.extend({
   layout: 'project',
 
-  validate({ params, app }) {
+  middleware: ['check-auth', 'auth', 'setCurrentProject', 'isProjectAdmin'],
+
+  validate({ params, store }) {
     if (/^\d+$/.test(params.id) && /^\d+$/.test(params.example_id)) {
-      return app.$services.project.findById(params.id).then((res: Project) => {
-        return res.isTextProject
-      })
+      const project = store.getters['projects/project'] as Project
+      return project.isTextProject
     }
     return false
   },
