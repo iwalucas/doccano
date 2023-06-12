@@ -3,7 +3,10 @@ import { ExampleItem, ExampleItemList } from '~/domain/models/example/example'
 export type SearchOption = { [key: string]: string | (string | null)[] }
 
 export interface ExampleRepository {
-  list(projectId: string, { limit, offset, q, isChecked }: SearchOption): Promise<ExampleItemList>
+  list(
+    projectId: string,
+    { limit, offset, q, isChecked, status, filenames }: SearchOption
+  ): Promise<ExampleItemList>
 
   create(projectId: string, item: ExampleItem): Promise<ExampleItem>
 

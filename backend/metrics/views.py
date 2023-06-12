@@ -64,3 +64,10 @@ class SpanTypeDistribution(LabelDistribution):
 class RelationTypeDistribution(LabelDistribution):
     model = Relation
     label_type = RelationType
+
+class FilenamesAPI(APIView):
+    permission_classes = [IsAuthenticated & (IsProjectAdmin | IsProjectStaffAndReadOnly)]
+
+    def get(self, request, *args, **kwargs):
+        data = Example.objects.filter(project=self.kwargs["project_id"]).values("upload_name")
+        return Response(data=data, status=status.HTTP_200_OK)

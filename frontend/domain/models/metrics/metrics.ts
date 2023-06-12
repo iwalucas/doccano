@@ -12,3 +12,7 @@ export interface MyProgress {
   complete: number
   remaining: number
 }
+
+export interface Filenames {
+  upload_name: string
+}

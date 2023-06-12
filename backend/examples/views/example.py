@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from examples.filters import ExampleFilter
-from examples.models import Example
+from examples.models import Example, ExampleState
 from examples.serializers import ExampleSerializer
 from projects.models import Project
 from projects.permissions import IsProjectAdmin, IsProjectStaffAndReadOnly
@@ -29,6 +29,23 @@ class ExampleList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         queryset = self.model.objects.filter(project=self.project)
+        examples = queryset.values("id")
+        status = self.request.GET.get("status")
+
+        if status == "none":
+            queryset = self.model.objects.filter(project=self.project)
+        else:
+            # get finished examples
+            if self.project.collaborative_annotation:
+                finished = ExampleState.objects.filter(example_id__in=examples).values("example_id")
+            else:
+                finished = ExampleState.objects.filter(example_id__in=examples, confirmed_by=self.request.user).values("example_id")
+
+            if status == "inprogress":
+                queryset = self.model.objects.filter(project=self.project).exclude(id__in=finished)
+            elif status == "finished":
+                queryset = self.model.objects.filter(project=self.project, id__in=finished)
+                
         if self.project.random_order:
             # Todo: fix the algorithm.
             random.seed(self.request.user.id)

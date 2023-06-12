@@ -1,27 +1,39 @@
 <template>
   <v-card>
     <v-card-title v-if="isProjectAdmin">
-      <action-menu
-        @upload="$router.push('dataset/import')"
-        @download="$router.push('dataset/export')"
-      />
-      <v-btn
-        class="text-capitalize ms-2"
-        :disabled="!canDelete"
-        outlined
-        @click.stop="dialogDelete = true"
-      >
-        {{ $t('generic.delete') }}
-      </v-btn>
+      <div class="title-components-container">
+        <action-menu
+          @upload="$router.push('dataset/import')"
+          @download="$router.push('dataset/export')"
+        />
+        <default-action-menu
+          text="Filter Status"
+          :items="actionMenuItems"
+          @none="queryUpdate('none')"
+          @inprogress="queryUpdate('inprogress')"
+          @finished="queryUpdate('finished')"
+        />
+        <dropdown-menu title="File Names" :content="dropDownItems" />
+      </div>
       <v-spacer />
-      <v-btn
-        :disabled="!item.count"
-        class="text-capitalize"
-        color="error"
-        @click="dialogDeleteAll = true"
-      >
-        {{ $t('generic.deleteAll') }}
-      </v-btn>
+      <div class="title-components-container">
+        <v-btn
+          class="text-capitalize ms-2"
+          :disabled="!canDelete"
+          outlined
+          @click.stop="dialogDelete = true"
+        >
+          {{ $t('generic.delete') }}
+        </v-btn>
+        <v-btn
+          :disabled="!item.count"
+          class="text-capitalize"
+          color="error"
+          @click="dialogDeleteAll = true"
+        >
+          {{ $t('generic.deleteAll') }}
+        </v-btn>
+      </div>
       <v-dialog v-model="dialogDelete">
         <form-delete
           :selected="selected"
@@ -67,15 +79,17 @@
 
 <script lang="ts">
 import _ from 'lodash'
-import { mapGetters } from 'vuex'
 import Vue from 'vue'
-import { NuxtAppOptions } from '@nuxt/types'
+import { mdiCheck, mdiClockOutline, mdiClose } from '@mdi/js'
 import DocumentList from '@/components/example/DocumentList.vue'
 import FormDelete from '@/components/example/FormDelete.vue'
 import FormDeleteBulk from '@/components/example/FormDeleteBulk.vue'
 import ActionMenu from '~/components/example/ActionMenu.vue'
+import DefaultActionMenu from '~/components/utils/ActionMenu.vue'
+import DropdownMenu from '~/components/utils/DropDown.vue'
 import AudioList from '~/components/example/AudioList.vue'
 import ImageList from '~/components/example/ImageList.vue'
+import { Project } from '~/domain/models/project/project'
 import { getLinkToAnnotationPage } from '~/presenter/linkToAnnotationPage'
 import { ExampleDTO, ExampleListDTO } from '~/services/application/example/exampleData'
 
@@ -86,14 +100,17 @@ export default Vue.extend({
     DocumentList,
     ImageList,
     FormDelete,
-    FormDeleteBulk
+    FormDeleteBulk,
+    DefaultActionMenu,
+    DropdownMenu
   },
 
   layout: 'project',
 
   middleware: ['check-auth', 'auth', 'setCurrentProject'],
 
-  validate({ params, query }: NuxtAppOptions) {
+  validate({ params, query }) {
+    // @ts-ignore
     return /^\d+$/.test(params.id) && /^\d+|$/.test(query.limit) && /^\d+|$/.test(query.offset)
   },
 
@@ -101,22 +118,24 @@ export default Vue.extend({
     return {
       dialogDelete: false,
       dialogDeleteAll: false,
+      project: {} as Project,
       item: {} as ExampleListDTO,
       selected: [] as ExampleDTO[],
       isLoading: false,
-      isProjectAdmin: false
+      isProjectAdmin: false,
+      showIcon: false,
+      dropDownItems: [] as string[]
     }
   },
 
   async fetch() {
     this.isLoading = true
     this.item = await this.$services.example.list(this.projectId, this.$route.query)
+    console.log(this.item)
     this.isLoading = false
   },
 
   computed: {
-    ...mapGetters('projects', ['project']),
-
     canDelete(): boolean {
       return this.selected.length > 0
     },
@@ -131,6 +150,26 @@ export default Vue.extend({
       } else {
         return 'text'
       }
+    },
+
+    actionMenuItems() {
+      return [
+        {
+          title: 'None',
+          icon: mdiClose,
+          event: 'none'
+        },
+        {
+          title: 'In progress',
+          icon: mdiClockOutline,
+          event: 'inprogress'
+        },
+        {
+          title: 'Finished',
+          icon: mdiCheck,
+          event: 'finished'
+        }
+      ]
     }
   },
 
@@ -142,8 +181,13 @@ export default Vue.extend({
   },
 
   async created() {
+    this.project = await this.$services.project.findById(this.projectId)
     const member = await this.$repositories.member.fetchMyRole(this.projectId)
     this.isProjectAdmin = member.isProjectAdmin
+
+    // make a request to /metrics/filenames
+    const filenames = await this.$repositories.metrics.fetchFilenames(this.projectId)
+    this.dropDownItems = filenames.map((item) => item.upload_name)
   },
 
   methods: {
@@ -175,6 +219,15 @@ export default Vue.extend({
 
     editItem(item: ExampleDTO) {
       this.$router.push(`dataset/${item.id}/edit`)
+    },
+
+    toggleIcon() {
+      this.showIcon = !this.showIcon
+    },
+
+    queryUpdate(value: string) {
+      const query = { ...this.$route.query, status: value }
+      this.$router.push({ path: this.$route.path, query })
     }
   }
 })
@@ -183,5 +236,10 @@ export default Vue.extend({
 <style scoped>
 ::v-deep .v-dialog {
   width: 800px;
+}
+
+.title-components-container {
+  display: flex;
+  gap: 0.5rem;
 }
 </style>
