@@ -1,5 +1,5 @@
 import ApiService from '@/services/api.service'
-import { Distribution, MyProgress, Progress } from '~/domain/models/metrics/metrics'
+import { Distribution, MyProgress, Progress, Filenames } from '~/domain/models/metrics/metrics'
 
 export class APIMetricsRepository {
   constructor(private readonly request = ApiService) {}
@@ -30,6 +30,12 @@ export class APIMetricsRepository {
 
   async fetchMyProgress(projectId: string): Promise<MyProgress> {
     const url = `/projects/${projectId}/metrics/progress`
+    const response = await this.request.get(url)
+    return response.data
+  }
+
+  async fetchFilenames(projectId: string): Promise<Filenames[]> {
+    const url = `/projects/${projectId}/metrics/filenames`
     const response = await this.request.get(url)
     return response.data
   }
