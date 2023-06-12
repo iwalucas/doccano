@@ -7,7 +7,7 @@
           @download="$router.push('dataset/export')"
         />
         <default-action-menu
-          text="Filter Status"
+          :text="statusText"
           :items="actionMenuItems"
           @none="queryUpdate('none')"
           @inprogress="queryUpdate('inprogress')"
@@ -124,7 +124,8 @@ export default Vue.extend({
       isLoading: false,
       isProjectAdmin: false,
       showIcon: false,
-      dropDownItems: [] as string[]
+      dropDownItems: [] as string[],
+      statusText: 'Status: None'
     }
   },
 
@@ -228,6 +229,12 @@ export default Vue.extend({
     queryUpdate(value: string) {
       const query = { ...this.$route.query, status: value }
       this.$router.push({ path: this.$route.path, query })
+
+      if (value === 'inprogress') {
+        this.statusText = 'Status: In Progress'
+      } else {
+        this.statusText = `Status: ${value[0].toUpperCase() + value.slice(1)}`
+      }
     }
   }
 })
