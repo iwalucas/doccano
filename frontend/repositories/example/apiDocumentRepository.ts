@@ -34,13 +34,13 @@ export class APIExampleRepository implements ExampleRepository {
       limit = '10',
       offset = '0',
       status = 'none',
-      filenames = 'true',
+      id = '0',
       q = '',
       isChecked = '',
       ordering = ''
     }: SearchOption
   ): Promise<ExampleItemList> {
-    const url = `/projects/${projectId}/examples?limit=${limit}&offset=${offset}&status=${status}&filenames=${filenames}&q=${q}&confirmed=${isChecked}&ordering=${ordering}`
+    const url = `/projects/${projectId}/examples?limit=${limit}&offset=${offset}&status=${status}&id=${id}&q=${q}&confirmed=${isChecked}&ordering=${ordering}`
     const response = await this.request.get(url)
     return new ExampleItemList(
       response.data.count,

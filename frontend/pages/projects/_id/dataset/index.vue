@@ -13,7 +13,12 @@
           @inprogress="queryUpdate('inprogress')"
           @finished="queryUpdate('finished')"
         />
-        <dropdown-menu title="File Names" :content="dropDownItems" />
+        <dropdown-menu
+          title="File Names"
+          :content="dropDownItems"
+          :clickEvent="dropDownClickEvent"
+          :searchEvent="dropDownSearchEvent"
+        />
       </div>
       <v-spacer />
       <div class="title-components-container">
@@ -124,7 +129,7 @@ export default Vue.extend({
       isLoading: false,
       isProjectAdmin: false,
       showIcon: false,
-      dropDownItems: [] as string[],
+      dropDownItems: [] as { id: number; text: string }[],
       statusText: 'Status: None'
     }
   },
@@ -132,7 +137,6 @@ export default Vue.extend({
   async fetch() {
     this.isLoading = true
     this.item = await this.$services.example.list(this.projectId, this.$route.query)
-    console.log(this.item)
     this.isLoading = false
   },
 
@@ -188,7 +192,10 @@ export default Vue.extend({
 
     // make a request to /metrics/filenames
     const filenames = await this.$repositories.metrics.fetchFilenames(this.projectId)
-    this.dropDownItems = filenames.map((item) => item.upload_name)
+    console.log(filenames)
+    this.dropDownItems = filenames.map((example) => {
+      return { id: example.id, text: example.upload_name }
+    })
   },
 
   methods: {
@@ -235,6 +242,15 @@ export default Vue.extend({
       } else {
         this.statusText = `Status: ${value[0].toUpperCase() + value.slice(1)}`
       }
+    },
+
+    dropDownClickEvent(id: string) {
+      const query = { ...this.$route.query, id }
+      this.$router.push({ path: this.$route.path, query })
+    },
+
+    dropDownSearchEvent(newValue: string) {
+      console.log(newValue)
     }
   }
 })
