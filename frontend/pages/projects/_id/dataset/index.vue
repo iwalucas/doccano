@@ -137,6 +137,7 @@ export default Vue.extend({
   async fetch() {
     this.isLoading = true
     this.item = await this.$services.example.list(this.projectId, this.$route.query)
+    console.log(this.item)
     this.isLoading = false
   },
 

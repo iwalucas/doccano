@@ -158,9 +158,9 @@ export default Vue.extend({
 
   methods: {
     toLabeling(item: ExampleDTO) {
-      const index = this.items.indexOf(item)
+      const index = item.id
       const offset = (this.options.page - 1) * this.options.itemsPerPage
-      const page = (offset + index + 1).toString()
+      const page = (offset + index).toString()
       this.$emit('click:labeling', { page, q: this.search })
     }
   }
