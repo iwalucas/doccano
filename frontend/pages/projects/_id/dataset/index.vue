@@ -137,7 +137,6 @@ export default Vue.extend({
   async fetch() {
     this.isLoading = true
     this.item = await this.$services.example.list(this.projectId, this.$route.query)
-    console.log(this.item)
     this.isLoading = false
   },
 
@@ -193,7 +192,6 @@ export default Vue.extend({
 
     // make a request to /metrics/filenames
     const filenames = await this.$repositories.metrics.fetchFilenames(this.projectId)
-    console.log(filenames)
     this.dropDownItems = filenames.map((example) => {
       return { id: example.id, text: example.upload_name }
     })
@@ -250,8 +248,12 @@ export default Vue.extend({
       this.$router.push({ path: this.$route.path, query })
     },
 
-    dropDownSearchEvent(newValue: string) {
-      console.log(newValue)
+    async dropDownSearchEvent(newValue: string) {
+      const filenames = await this.$repositories.metrics.fetchFilenames(this.projectId, newValue)
+      console.log(filenames)
+      this.dropDownItems = filenames.map((example) => {
+        return { id: example.id, text: example.upload_name }
+      })
     }
   }
 })

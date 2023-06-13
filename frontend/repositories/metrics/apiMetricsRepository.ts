@@ -34,8 +34,8 @@ export class APIMetricsRepository {
     return response.data
   }
 
-  async fetchFilenames(projectId: string): Promise<Filenames[]> {
-    const url = `/projects/${projectId}/metrics/filenames`
+  async fetchFilenames(projectId: string, searchValue?: string): Promise<Filenames[]> {
+    const url = `/projects/${projectId}/metrics/filenames?search=${searchValue}`
     const response = await this.request.get(url)
     return response.data
   }

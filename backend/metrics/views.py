@@ -69,5 +69,10 @@ class FilenamesAPI(APIView):
     permission_classes = [IsAuthenticated & (IsProjectAdmin | IsProjectStaffAndReadOnly)]
 
     def get(self, request, *args, **kwargs):
-        data = Example.objects.filter(project=self.kwargs["project_id"]).values("upload_name", "id")
-        return Response(data=data, status=status.HTTP_200_OK)
+        search = request.GET.get("search")
+        if search == "undefined" or search == "":
+            data = Example.objects.filter(project=self.kwargs["project_id"]).values("upload_name", "id")
+            return Response(data=data, status=status.HTTP_200_OK)
+        else:
+            data = Example.objects.filter(project=self.kwargs["project_id"], upload_name__icontains=search).values("upload_name", "id")
+            return Response(data=data, status=status.HTTP_200_OK)
