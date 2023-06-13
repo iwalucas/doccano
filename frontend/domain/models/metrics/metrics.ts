@@ -14,6 +14,5 @@ export interface MyProgress {
 }
 
 export interface Filenames {
-  id: number
   upload_name: string
 }
