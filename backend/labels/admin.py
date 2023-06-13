@@ -6,10 +6,13 @@ from .models import BoundingBox, Category, Segmentation, Span, TextLabel
 class SpanAdmin(admin.ModelAdmin):
     list_display = ("example", "label", "start_offset", "user")
     ordering = ("example",)
+    list_filter = ("label")
+    search_fields = ("example__id",)
 
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ("example", "label", "user")
+    list_filter = ("label")
     ordering = ("example",)
 
 
@@ -21,10 +24,12 @@ class TextLabelAdmin(admin.ModelAdmin):
 class BoundingBoxAdmin(admin.ModelAdmin):
     list_display = ("example", "label", "user", "x", "y", "width", "height")
     ordering = ("example",)
+    list_filter = ("label")
 
 
 class SegmentationAdmin(admin.ModelAdmin):
     list_display = ("example", "label", "user", "points")
+    list_filter = ("label")
     ordering = ("example",)
 
 
