@@ -63,7 +63,8 @@ export default Vue.extend({
 
   data() {
     return {
-      filenameSearch: null,
+      filenameSearch: '',
+      searchTimer: null as ReturnType<typeof setTimeout> | null,
       mdiMenuDown,
       mdiMagnify
     }
@@ -72,12 +73,20 @@ export default Vue.extend({
   methods: {
     handleItemClick(key: number) {
       this.clickEvent('' + key)
+    },
+
+    makeServerRequest() {
+      this.searchEvent(this.filenameSearch)
     }
   },
 
   watch: {
-    filenameSearch(newValue) {
-      this.searchEvent(newValue)
+    filenameSearch() {
+      clearTimeout(this.searchTimer!)
+
+      this.searchTimer = setTimeout(() => {
+        this.makeServerRequest()
+      }, 500)
     }
   }
 })
