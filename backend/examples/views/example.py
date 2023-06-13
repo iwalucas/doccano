@@ -31,14 +31,9 @@ class ExampleList(generics.ListCreateAPIView):
         queryset = self.model.objects.filter(project=self.project)
         examples = queryset.values("id")
         status = self.request.GET.get("status")
-        id = self.request.GET.get("id")
 
         if status == "none":
-            if id != '0':
-                queryset = self.model.objects.filter(project=self.project, id=id)
-            else:
-                queryset = self.model.objects.filter(project=self.project)
-
+            queryset = self.model.objects.filter(project=self.project)
         else:
             # get finished examples
             if self.project.collaborative_annotation:
@@ -47,17 +42,10 @@ class ExampleList(generics.ListCreateAPIView):
                 finished = ExampleState.objects.filter(example_id__in=examples, confirmed_by=self.request.user).values("example_id")
 
             if status == "inprogress":
-                if id != '0':
-                    queryset = self.model.objects.filter(project=self.project, id=id).exclude(id__in=finished)
-                else:
-                    queryset = self.model.objects.filter(project=self.project).exclude(id__in=finished)
-                    
+                queryset = self.model.objects.filter(project=self.project).exclude(id__in=finished)
             elif status == "finished":
-                if id != '0':
-                    queryset = self.model.objects.filter(project=self.project, id=id, id__in=finished)
-                else:
-                    queryset = self.model.objects.filter(project=self.project, id__in=finished)
-                    
+                queryset = self.model.objects.filter(project=self.project, id__in=finished)
+                
         if self.project.random_order:
             # Todo: fix the algorithm.
             random.seed(self.request.user.id)

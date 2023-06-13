@@ -7,18 +7,13 @@
           @download="$router.push('dataset/export')"
         />
         <default-action-menu
-          :text="statusText"
+          text="Filter Status"
           :items="actionMenuItems"
           @none="queryUpdate('none')"
           @inprogress="queryUpdate('inprogress')"
           @finished="queryUpdate('finished')"
         />
-        <dropdown-menu
-          title="File Names"
-          :content="dropDownItems"
-          :clickEvent="dropDownClickEvent"
-          :searchEvent="dropDownSearchEvent"
-        />
+        <dropdown-menu title="File Names" :content="dropDownItems" />
       </div>
       <v-spacer />
       <div class="title-components-container">
@@ -129,8 +124,7 @@ export default Vue.extend({
       isLoading: false,
       isProjectAdmin: false,
       showIcon: false,
-      dropDownItems: [] as { id: number; text: string }[],
-      statusText: 'Status: None'
+      dropDownItems: [] as string[]
     }
   },
 
@@ -193,10 +187,7 @@ export default Vue.extend({
 
     // make a request to /metrics/filenames
     const filenames = await this.$repositories.metrics.fetchFilenames(this.projectId)
-    console.log(filenames)
-    this.dropDownItems = filenames.map((example) => {
-      return { id: example.id, text: example.upload_name }
-    })
+    this.dropDownItems = filenames.map((item) => item.upload_name)
   },
 
   methods: {
@@ -237,21 +228,6 @@ export default Vue.extend({
     queryUpdate(value: string) {
       const query = { ...this.$route.query, status: value }
       this.$router.push({ path: this.$route.path, query })
-
-      if (value === 'inprogress') {
-        this.statusText = 'Status: In Progress'
-      } else {
-        this.statusText = `Status: ${value[0].toUpperCase() + value.slice(1)}`
-      }
-    },
-
-    dropDownClickEvent(id: string) {
-      const query = { ...this.$route.query, id }
-      this.$router.push({ path: this.$route.path, query })
-    },
-
-    dropDownSearchEvent(newValue: string) {
-      console.log(newValue)
     }
   }
 })
