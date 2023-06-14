@@ -311,7 +311,7 @@ export default {
 
 <style scoped>
 .annotation-text {
-  font-size: 1.25rem !important;
+  font-size: 0.8rem !important;
   font-weight: 500;
   line-height: 2rem;
   font-family: monospace !important;
